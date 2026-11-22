@@ -1,4 +1,3 @@
-
 import os
 import re
 
@@ -34,6 +33,9 @@ from app.schemas import (
 
 from app.security import hash_password, verify_password
 
+# Inicialización de datos para Render
+from app.bootstrap import bootstrap_demo
+
 
 # =====================================================
 # CONFIGURACION GENERAL
@@ -42,7 +44,7 @@ from app.security import hash_password, verify_password
 BASE_DIR = Path(__file__).resolve().parent.parent
 STATIC_DIR = BASE_DIR / "static"
 
-# Crear las tablas de la base de datos
+# Crear las tablas si todavía no existen
 Base.metadata.create_all(bind=engine)
 
 app = FastAPI(
@@ -51,7 +53,26 @@ app = FastAPI(
     version="1.0.0"
 )
 
-# Configuración de sesiones
+
+# =====================================================
+# INICIALIZACION DE DATOS DE DEMOSTRACION
+# =====================================================
+
+@app.on_event("startup")
+def initialize_demo():
+    """
+    Crear automáticamente la cuenta de dueño y los vehículos
+    de demostración cuando Render inicia la aplicación.
+    """
+
+    if os.getenv("BOOTSTRAP_DEMO", "false").lower() == "true":
+        bootstrap_demo()
+
+
+# =====================================================
+# CONFIGURACION DE SESIONES
+# =====================================================
+
 app.add_middleware(
     SessionMiddleware,
     secret_key=os.getenv(
@@ -59,11 +80,18 @@ app.add_middleware(
         "autorrent-local-development-secret-change-before-deployment"
     ),
     same_site="lax",
-    https_only=False,
+    https_only=os.getenv(
+        "SESSION_HTTPS_ONLY",
+        "false"
+    ).lower() == "true",
     max_age=28800
 )
 
-# Archivos estáticos
+
+# =====================================================
+# ARCHIVOS ESTATICOS
+# =====================================================
+
 app.mount(
     "/static",
     StaticFiles(directory=str(STATIC_DIR)),

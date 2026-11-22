@@ -4,7 +4,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Sistema de Arriendo de Autos</title>
+
+    <title>AutoRent - Inicio</title>
 
     <style>
         * {
@@ -15,190 +16,100 @@
 
         body {
             font-family: Arial, sans-serif;
-            background: #f3f5f9;
-            color: #202b3c;
+            background: #f1f5f9;
+            color: #1e293b;
         }
 
         header {
             background: #172554;
             color: white;
-            padding: 25px 7%;
+            padding: 25px 8%;
         }
 
         header h1 {
-            margin-bottom: 8px;
+            font-size: 28px;
         }
 
         header p {
             color: #cbd5e1;
+            margin-top: 8px;
         }
 
         main {
-            max-width: 1150px;
-            margin: 30px auto;
-            padding: 0 20px;
+            max-width: 1000px;
+            margin: 65px auto;
+            padding: 20px;
+            text-align: center;
         }
 
-        .stats {
-            display: grid;
-            grid-template-columns: repeat(3, 1fr);
-            gap: 18px;
-            margin-bottom: 25px;
-        }
-
-        .stat-card, .section {
-            background: white;
-            padding: 22px;
-            border-radius: 12px;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
-        }
-
-        .stat-card h3 {
-            color: #64748b;
-            font-size: 14px;
-            margin-bottom: 10px;
-        }
-
-        .stat-card strong {
+        main h2 {
             font-size: 30px;
+            margin-bottom: 12px;
         }
 
-        .section {
+        main > p {
+            color: #64748b;
+            margin-bottom: 35px;
+        }
+
+        .options {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 25px;
+        }
+
+        .card {
+            background: white;
+            padding: 40px 25px;
+            border-radius: 15px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.06);
+        }
+
+        .icon {
+            font-size: 55px;
+            margin-bottom: 20px;
+        }
+
+        .card h3 {
+            font-size: 23px;
+            margin-bottom: 12px;
+        }
+
+        .card p {
+            color: #64748b;
+            line-height: 1.6;
             margin-bottom: 25px;
         }
 
-        .section h2 {
-            margin-bottom: 20px;
-            font-size: 21px;
-        }
-
-        .form-grid {
-            display: grid;
-            grid-template-columns: repeat(3, 1fr);
-            gap: 15px;
-        }
-
-        label {
-            display: block;
-            font-size: 14px;
-            font-weight: bold;
-            margin-bottom: 7px;
-        }
-
-        input, select {
-            width: 100%;
-            padding: 11px;
-            border: 1px solid #cbd5e1;
-            border-radius: 7px;
-            font-size: 14px;
-        }
-
-        button {
-            border: none;
-            border-radius: 7px;
-            padding: 12px 18px;
-            cursor: pointer;
-            font-weight: bold;
-            font-size: 14px;
-        }
-
-        button:disabled {
-            opacity: 0.5;
-            cursor: not-allowed;
-        }
-
-        .primary {
-            background: #2563eb;
-            color: white;
-            margin-top: 17px;
-        }
-
-        .rent {
-            background: #2563eb;
-            color: white;
-        }
-
-        .return {
-            background: #ea580c;
-            color: white;
-        }
-
-        .vehicles-grid {
-            display: grid;
-            grid-template-columns: repeat(3, 1fr);
-            gap: 17px;
-        }
-
-        .vehicle-card {
-            border: 1px solid #e2e8f0;
-            border-radius: 10px;
-            padding: 18px;
-        }
-
-        .vehicle-card h3 {
-            margin: 12px 0 8px;
-        }
-
-        .vehicle-card p {
-            color: #64748b;
-            font-size: 14px;
-            margin: 7px 0;
-        }
-
-        .status {
+        .button {
             display: inline-block;
-            padding: 6px 10px;
-            border-radius: 20px;
-            font-size: 12px;
+            padding: 13px 25px;
+            border-radius: 8px;
+            text-decoration: none;
+            color: white;
             font-weight: bold;
         }
 
-        .available {
-            background: #dcfce7;
-            color: #166534;
+        .customer {
+            background: #2563eb;
         }
 
-        .rented {
-            background: #ffedd5;
-            color: #9a3412;
+        .owner {
+            background: #059669;
         }
 
-        .vehicle-card button {
-            width: 100%;
-            margin-top: 15px;
-        }
-
-        .message {
-            padding: 12px;
-            margin-bottom: 18px;
-            border-radius: 7px;
-            display: none;
-        }
-
-        .success {
-            background: #dcfce7;
-            color: #166534;
-        }
-
-        .error {
-            background: #fee2e2;
-            color: #991b1b;
-        }
-
-        .empty {
-            color: #64748b;
-            padding: 15px 0;
+        .button:hover {
+            opacity: 0.85;
         }
 
         footer {
             text-align: center;
-            color: #64748b;
             padding: 25px;
-            font-size: 13px;
+            color: #64748b;
         }
 
-        @media (max-width: 750px) {
-            .stats, .form-grid, .vehicles-grid {
+        @media(max-width: 650px) {
+            .options {
                 grid-template-columns: 1fr;
             }
         }
@@ -208,388 +119,61 @@
 <body>
 
 <header>
-    <h1>🚗 Sistema de Arriendo de Autos</h1>
-    <p>Administración de vehículos y arriendos</p>
+    <h1>🚗 AutoRent</h1>
+    <p>Sistema de arriendo de vehículos</p>
 </header>
 
 <main>
 
-    <div id="message" class="message"></div>
+    <h2>Bienvenido a AutoRent</h2>
 
-    <section class="stats">
-        <div class="stat-card">
-            <h3>Total de vehículos</h3>
-            <strong id="totalVehicles">0</strong>
-        </div>
+    <p>
+        Selecciona cómo deseas ingresar al sistema.
+    </p>
 
-        <div class="stat-card">
-            <h3>Vehículos disponibles</h3>
-            <strong id="availableVehicles">0</strong>
-        </div>
+    <div class="options">
 
-        <div class="stat-card">
-            <h3>Vehículos arrendados</h3>
-            <strong id="rentedVehicles">0</strong>
-        </div>
-    </section>
+        <section class="card">
 
-    <section class="section">
-        <h2>Registrar nuevo vehículo</h2>
+            <div class="icon">👤</div>
 
-        <form id="vehicleForm">
-            <div class="form-grid">
+            <h3>Cliente</h3>
 
-                <div>
-                    <label>Marca</label>
-                    <input name="brand" placeholder="Toyota"
-                           required maxlength="50">
-                </div>
+            <p>
+                Explora nuestro catálogo de automóviles,
+                consulta su disponibilidad y solicita un arriendo.
+            </p>
 
-                <div>
-                    <label>Modelo</label>
-                    <input name="model" placeholder="Corolla"
-                           required maxlength="50">
-                </div>
+            <a class="button customer" href="/login?role=CUSTOMER">
+                Ingresar como cliente
+            </a>
 
-                <div>
-                    <label>Año</label>
-                    <input name="year" type="number"
-                           min="1900" max="2100" required>
-                </div>
+        </section>
 
-                <div>
-                    <label>Patente</label>
-                    <input name="plate" placeholder="AB-CD-12"
-                           required maxlength="20">
-                </div>
+        <section class="card">
 
-                <div>
-                    <label>Precio por día (CLP)</label>
-                    <input name="daily_price" type="number"
-                           min="1" step="1" required>
-                </div>
+            <div class="icon">🔑</div>
 
-            </div>
+            <h3>Dueño</h3>
 
-            <button class="primary" type="submit">
-                Registrar vehículo
-            </button>
-        </form>
-    </section>
+            <p>
+                Administra los vehículos, registra automóviles,
+                controla los arriendos y las devoluciones.
+            </p>
 
-    <section class="section">
-        <h2>Registrar un arriendo</h2>
+            <a class="button owner" href="/login?role=OWNER">
+                Ingresar como dueño
+            </a>
 
-        <form id="rentalForm">
-            <div class="form-grid">
+        </section>
 
-                <div>
-                    <label>Vehículo disponible</label>
-                    <select id="rentalVehicle" required>
-                        <option value="">Seleccionar vehículo</option>
-                    </select>
-                </div>
-
-                <div>
-                    <label>Nombre del cliente</label>
-                    <input id="customerName" required
-                           minlength="2" maxlength="100"
-                           placeholder="Nombre del cliente">
-                </div>
-
-                <div>
-                    <label>Fecha de inicio</label>
-                    <input id="startDate" type="date" required>
-                </div>
-
-                <div>
-                    <label>Fecha de devolución prevista</label>
-                    <input id="endDate" type="date" required>
-                </div>
-
-            </div>
-
-            <button class="primary" id="rentalButton" type="submit">
-                Confirmar arriendo
-            </button>
-        </form>
-    </section>
-
-    <section class="section">
-        <h2>Vehículos registrados</h2>
-
-        <div id="vehiclesList" class="vehicles-grid">
-            <p class="empty">Cargando vehículos...</p>
-        </div>
-    </section>
+    </div>
 
 </main>
 
 <footer>
-    Sistema de Arriendo de Autos | Proyecto académico
+    AutoRent - Proyecto académico
 </footer>
-
-<script>
-
-    let vehicles = [];
-
-    function escapeHTML(value) {
-        return String(value).replace(/[&<>"']/g, function(character) {
-            return {
-                "&": "&amp;",
-                "<": "&lt;",
-                ">": "&gt;",
-                '"': "&quot;",
-                "'": "&#039;"
-            }[character];
-        });
-    }
-
-    function showMessage(message, type) {
-        const element = document.getElementById("message");
-
-        element.textContent = message;
-        element.className = "message " + type;
-        element.style.display = "block";
-
-        window.scrollTo({ top: 0, behavior: "smooth" });
-
-        setTimeout(() => {
-            element.style.display = "none";
-        }, 5000);
-    }
-
-    async function apiRequest(url, options = {}) {
-        const response = await fetch(url, {
-            ...options,
-            headers: {
-                "Content-Type": "application/json",
-                ...options.headers
-            }
-        });
-
-        const data = await response.json().catch(() => ({}));
-
-        if (!response.ok) {
-            throw new Error(
-                data.detail || "No se pudo completar la operación"
-            );
-        }
-
-        return data;
-    }
-
-    function formatPrice(price) {
-        return new Intl.NumberFormat("es-CL", {
-            style: "currency",
-            currency: "CLP",
-            maximumFractionDigits: 0
-        }).format(price);
-    }
-
-    async function loadVehicles() {
-        try {
-            vehicles = await apiRequest("/vehicles");
-
-            updateStatistics();
-            renderVehicles();
-            updateRentalOptions();
-
-        } catch (error) {
-            showMessage(error.message, "error");
-        }
-    }
-
-    function updateStatistics() {
-        const available = vehicles.filter(
-            vehicle => vehicle.status === "AVAILABLE"
-        ).length;
-
-        const rented = vehicles.filter(
-            vehicle => vehicle.status === "RENTED"
-        ).length;
-
-        document.getElementById("totalVehicles").textContent =
-            vehicles.length;
-
-        document.getElementById("availableVehicles").textContent =
-            available;
-
-        document.getElementById("rentedVehicles").textContent =
-            rented;
-    }
-
-    function renderVehicles() {
-        const container = document.getElementById("vehiclesList");
-
-        if (vehicles.length === 0) {
-            container.innerHTML =
-                '<p class="empty">Todavía no hay vehículos registrados.</p>';
-            return;
-        }
-
-        container.innerHTML = vehicles.map(vehicle => {
-
-            const available = vehicle.status === "AVAILABLE";
-
-            const badge = available
-                ? '<span class="status available">Disponible</span>'
-                : '<span class="status rented">Arrendado</span>';
-
-            const button = available
-                ? '<p>Selecciona el vehículo en el formulario de arriendo.</p>'
-                : `<button class="return"
-                     onclick="returnVehicle(${vehicle.id})">
-                     Registrar devolución
-                   </button>`;
-
-            return `
-                <article class="vehicle-card">
-                    ${badge}
-                    <h3>${escapeHTML(vehicle.brand)}
-                        ${escapeHTML(vehicle.model)}</h3>
-                    <p>Patente: ${escapeHTML(vehicle.plate)}</p>
-                    <p>Año: ${vehicle.year}</p>
-                    <p>Precio por día: ${formatPrice(vehicle.daily_price)}</p>
-                    <p>Estado: ${available ? "Disponible" : "Arrendado"}</p>
-                    ${button}
-                </article>
-            `;
-
-        }).join("");
-    }
-
-    function updateRentalOptions() {
-        const select = document.getElementById("rentalVehicle");
-
-        const availableVehicles = vehicles.filter(
-            vehicle => vehicle.status === "AVAILABLE"
-        );
-
-        select.innerHTML =
-            '<option value="">Seleccionar vehículo</option>';
-
-        availableVehicles.forEach(vehicle => {
-            const option = document.createElement("option");
-
-            option.value = vehicle.id;
-            option.textContent =
-                `${vehicle.brand} ${vehicle.model} - ${vehicle.plate}`;
-
-            select.appendChild(option);
-        });
-
-        document.getElementById("rentalButton").disabled =
-            availableVehicles.length === 0;
-    }
-
-    document.getElementById("vehicleForm").addEventListener(
-        "submit",
-        async function(event) {
-
-            event.preventDefault();
-
-            const form = new FormData(this);
-
-            const vehicle = {
-                brand: form.get("brand").trim(),
-                model: form.get("model").trim(),
-                year: Number(form.get("year")),
-                plate: form.get("plate").trim().toUpperCase(),
-                daily_price: Number(form.get("daily_price"))
-            };
-
-            try {
-                await apiRequest("/vehicles", {
-                    method: "POST",
-                    body: JSON.stringify(vehicle)
-                });
-
-                this.reset();
-
-                showMessage(
-                    "Vehículo registrado correctamente.",
-                    "success"
-                );
-
-                await loadVehicles();
-
-            } catch (error) {
-                showMessage(error.message, "error");
-            }
-        }
-    );
-
-    document.getElementById("rentalForm").addEventListener(
-        "submit",
-        async function(event) {
-
-            event.preventDefault();
-
-            const rental = {
-                vehicle_id: Number(
-                    document.getElementById("rentalVehicle").value
-                ),
-                customer_name: document.getElementById(
-                    "customerName"
-                ).value.trim(),
-                start_date: document.getElementById("startDate").value,
-                end_date: document.getElementById("endDate").value
-            };
-
-            try {
-                await apiRequest("/rentals", {
-                    method: "POST",
-                    body: JSON.stringify(rental)
-                });
-
-                this.reset();
-
-                showMessage(
-                    "Arriendo registrado correctamente.",
-                    "success"
-                );
-
-                await loadVehicles();
-
-            } catch (error) {
-                showMessage(error.message, "error");
-            }
-        }
-    );
-
-    async function returnVehicle(vehicleId) {
-
-        const confirmed = confirm(
-            "¿Deseas registrar la devolución de este vehículo?"
-        );
-
-        if (!confirmed) {
-            return;
-        }
-
-        try {
-            await apiRequest(
-                `/vehicles/${vehicleId}/return`,
-                { method: "PUT" }
-            );
-
-            showMessage(
-                "Devolución registrada. El vehículo está disponible.",
-                "success"
-            );
-
-            await loadVehicles();
-
-        } catch (error) {
-            showMessage(error.message, "error");
-        }
-    }
-
-    // Cargar vehículos al abrir la página
-    loadVehicles();
-
-</script>
 
 </body>
 </html>

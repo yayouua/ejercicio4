@@ -1,0 +1,555 @@
+
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>AutoRent - Catálogo de vehículos</title>
+
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: Arial, sans-serif;
+            background: #f1f5f9;
+            color: #1e293b;
+        }
+
+        header {
+            background: #172554;
+            color: white;
+            padding: 25px 7%;
+        }
+
+        header p {
+            color: #cbd5e1;
+            margin-top: 7px;
+        }
+
+        main {
+            max-width: 1200px;
+            margin: 30px auto;
+            padding: 0 20px;
+        }
+
+        .top {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 15px;
+            margin-bottom: 25px;
+            flex-wrap: wrap;
+        }
+
+        .back {
+            color: #2563eb;
+            text-decoration: none;
+            font-weight: bold;
+        }
+
+        .filters {
+            display: grid;
+            grid-template-columns: 2fr 1fr;
+            gap: 15px;
+            margin-bottom: 25px;
+        }
+
+        input, select {
+            width: 100%;
+            padding: 13px;
+            border: 1px solid #cbd5e1;
+            border-radius: 8px;
+            background: white;
+            font-size: 14px;
+        }
+
+        .summary {
+            margin-bottom: 20px;
+            color: #64748b;
+        }
+
+        .vehicles {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 20px;
+        }
+
+        .card {
+            background: white;
+            padding: 20px;
+            border-radius: 12px;
+            box-shadow: 0 3px 10px rgba(0,0,0,0.05);
+        }
+
+        .car-icon {
+            font-size: 50px;
+            text-align: center;
+            padding: 20px;
+            background: #eff6ff;
+            border-radius: 10px;
+            margin-bottom: 15px;
+        }
+
+        .card h3 {
+            margin: 12px 0;
+        }
+
+        .card p {
+            color: #64748b;
+            margin: 8px 0;
+            font-size: 14px;
+        }
+
+        .status {
+            display: inline-block;
+            padding: 6px 10px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: bold;
+        }
+
+        .available {
+            color: #166534;
+            background: #dcfce7;
+        }
+
+        .rented {
+            color: #9a3412;
+            background: #ffedd5;
+        }
+
+        button {
+            width: 100%;
+            border: none;
+            padding: 12px;
+            margin-top: 15px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: bold;
+            background: #2563eb;
+            color: white;
+        }
+
+        button:disabled {
+            background: #94a3b8;
+            cursor: not-allowed;
+        }
+
+        .form-section {
+            background: white;
+            padding: 24px;
+            margin-top: 30px;
+            margin-bottom: 30px;
+            border-radius: 12px;
+            display: none;
+        }
+
+        .form-section h2 {
+            margin-bottom: 20px;
+        }
+
+        .form-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 15px;
+        }
+
+        .form-grid label {
+            display: block;
+            margin-bottom: 7px;
+            font-size: 14px;
+            font-weight: bold;
+        }
+
+        .message {
+            display: none;
+            padding: 13px;
+            margin-bottom: 20px;
+            border-radius: 8px;
+        }
+
+        .success {
+            display: block;
+            background: #dcfce7;
+            color: #166534;
+        }
+
+        .error {
+            display: block;
+            background: #fee2e2;
+            color: #991b1b;
+        }
+
+        .empty {
+            grid-column: 1 / -1;
+            color: #64748b;
+            padding: 30px;
+            text-align: center;
+        }
+
+        footer {
+            text-align: center;
+            padding: 25px;
+            color: #64748b;
+        }
+
+        @media(max-width: 850px) {
+            .vehicles {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+
+        @media(max-width: 550px) {
+            .vehicles, .filters, .form-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+<header>
+    <h1>🚗 AutoRent - Catálogo de vehículos</h1>
+    <p>Encuentra el automóvil que necesitas.</p>
+</header>
+
+<main>
+
+    <div class="top">
+        <h2>Vehículos disponibles para arriendo</h2>
+        <a class="back" href="/">← Volver al inicio</a>
+    </div>
+
+    <div id="message" class="message"></div>
+
+    <section class="filters">
+
+        <input
+            id="search"
+            type="search"
+            placeholder="Buscar por marca, modelo o patente..."
+        >
+
+        <select id="statusFilter">
+            <option value="ALL">Todos los estados</option>
+            <option value="AVAILABLE">Disponibles</option>
+            <option value="RENTED">Arrendados</option>
+        </select>
+
+    </section>
+
+    <p id="summary" class="summary">Cargando vehículos...</p>
+
+    <section id="vehiclesList" class="vehicles"></section>
+
+    <section id="rentalSection" class="form-section">
+
+        <h2>Solicitar arriendo</h2>
+
+        <p id="selectedVehicle"></p>
+
+        <form id="rentalForm">
+
+            <input type="hidden" id="vehicleId">
+
+            <div class="form-grid">
+
+                <div>
+                    <label for="customerName">Nombre del cliente</label>
+                    <input
+                        id="customerName"
+                        required
+                        minlength="2"
+                        maxlength="100"
+                        placeholder="Tu nombre"
+                    >
+                </div>
+
+                <div>
+                    <label for="startDate">Fecha de inicio</label>
+                    <input id="startDate" type="date" required>
+                </div>
+
+                <div>
+                    <label for="endDate">Fecha de devolución</label>
+                    <input id="endDate" type="date" required>
+                </div>
+
+            </div>
+
+            <button type="submit">Confirmar arriendo</button>
+
+            <button type="button" id="cancelRental"
+                    style="background:#64748b">
+                Cancelar
+            </button>
+
+        </form>
+
+    </section>
+
+</main>
+
+<footer>
+    AutoRent - Proyecto académico
+</footer>
+
+<script>
+
+    let vehicles = [];
+
+    function escapeHTML(value) {
+        return String(value).replace(/[&<>"']/g, character => ({
+            "&": "&amp;",
+            "<": "&lt;",
+            ">": "&gt;",
+            '"': "&quot;",
+            "'": "&#039;"
+        })[character]);
+    }
+
+    function formatPrice(price) {
+        return new Intl.NumberFormat("es-CL", {
+            style: "currency",
+            currency: "CLP",
+            maximumFractionDigits: 0
+        }).format(price);
+    }
+
+    function showMessage(message, type) {
+        const box = document.getElementById("message");
+        box.textContent = message;
+        box.className = "message " + type;
+
+        window.scrollTo({top: 0, behavior: "smooth"});
+    }
+
+    async function apiRequest(url, options = {}) {
+        const response = await fetch(url, {
+            ...options,
+            headers: {
+                "Content-Type": "application/json",
+                ...options.headers
+            }
+        });
+
+        const data = await response.json().catch(() => ({}));
+
+        if (!response.ok) {
+            let detail = data.detail || "Error al procesar la solicitud.";
+
+            if (Array.isArray(detail)) {
+                detail = detail.map(item => item.msg).join(", ");
+            }
+
+            throw new Error(detail);
+        }
+
+        return data;
+    }
+
+    async function loadVehicles() {
+        try {
+            vehicles = await apiRequest("/vehicles");
+            renderVehicles();
+        } catch (error) {
+            showMessage(error.message, "error");
+        }
+    }
+
+    function renderVehicles() {
+
+        const search = document.getElementById("search")
+            .value.toLowerCase().trim();
+
+        const status = document.getElementById("statusFilter").value;
+
+        const filtered = vehicles.filter(vehicle => {
+
+            const matchesSearch =
+                vehicle.brand.toLowerCase().includes(search) ||
+                vehicle.model.toLowerCase().includes(search) ||
+                vehicle.plate.toLowerCase().includes(search);
+
+            const matchesStatus =
+                status === "ALL" || vehicle.status === status;
+
+            return matchesSearch && matchesStatus;
+        });
+
+        const available = vehicles.filter(
+            vehicle => vehicle.status === "AVAILABLE"
+        ).length;
+
+        document.getElementById("summary").textContent =
+            `${vehicles.length} vehículos registrados · ${available} disponibles`;
+
+        const container = document.getElementById("vehiclesList");
+
+        if (filtered.length === 0) {
+            container.innerHTML =
+                '<p class="empty">No se encontraron vehículos.</p>';
+            return;
+        }
+
+        container.innerHTML = filtered.map(vehicle => {
+
+            const isAvailable = vehicle.status === "AVAILABLE";
+
+            return `
+                <article class="card">
+
+                    <div class="car-icon">🚘</div>
+
+                    <span class="status ${isAvailable ? "available" : "rented"}">
+                        ${isAvailable ? "Disponible" : "Arrendado"}
+                    </span>
+
+                    <h3>
+                        ${escapeHTML(vehicle.brand)}
+                        ${escapeHTML(vehicle.model)}
+                    </h3>
+
+                    <p>Año: ${vehicle.year}</p>
+
+                    <p>Patente: ${escapeHTML(vehicle.plate)}</p>
+
+                    <p>Precio por día:
+                        <strong>${formatPrice(vehicle.daily_price)}</strong>
+                    </p>
+
+                    <button
+                        class="rent-button"
+                        data-id="${vehicle.id}"
+                        ${isAvailable ? "" : "disabled"}
+                    >
+                        ${isAvailable ? "Seleccionar automóvil" : "No disponible"}
+                    </button>
+
+                </article>
+            `;
+
+        }).join("");
+    }
+
+    function openRental(vehicleId) {
+
+        const vehicle = vehicles.find(
+            item => item.id === Number(vehicleId)
+        );
+
+        if (!vehicle || vehicle.status !== "AVAILABLE") {
+            showMessage("Este vehículo ya no está disponible.", "error");
+            loadVehicles();
+            return;
+        }
+
+        document.getElementById("vehicleId").value = vehicle.id;
+
+        document.getElementById("selectedVehicle").textContent =
+            `Vehículo seleccionado: ${vehicle.brand} ${vehicle.model} - ${vehicle.plate}`;
+
+        document.getElementById("rentalSection").style.display = "block";
+
+        document.getElementById("rentalSection").scrollIntoView({
+            behavior: "smooth"
+        });
+    }
+
+    document.getElementById("vehiclesList").addEventListener(
+        "click",
+        event => {
+            const button = event.target.closest(".rent-button");
+
+            if (button && !button.disabled) {
+                openRental(button.dataset.id);
+            }
+        }
+    );
+
+    document.getElementById("search").addEventListener(
+        "input", renderVehicles
+    );
+
+    document.getElementById("statusFilter").addEventListener(
+        "change", renderVehicles
+    );
+
+    document.getElementById("cancelRental").addEventListener(
+        "click", () => {
+            document.getElementById("rentalSection").style.display = "none";
+            document.getElementById("rentalForm").reset();
+        }
+    );
+
+    const today = new Date();
+    const todayString = [
+        today.getFullYear(),
+        String(today.getMonth() + 1).padStart(2, "0"),
+        String(today.getDate()).padStart(2, "0")
+    ].join("-");
+
+    const startInput = document.getElementById("startDate");
+    const endInput = document.getElementById("endDate");
+
+    startInput.min = todayString;
+    endInput.min = todayString;
+
+    startInput.addEventListener("change", () => {
+        endInput.min = startInput.value || todayString;
+    });
+
+    document.getElementById("rentalForm").addEventListener(
+        "submit",
+        async event => {
+
+            event.preventDefault();
+
+            const rental = {
+                vehicle_id: Number(
+                    document.getElementById("vehicleId").value
+                ),
+
+                customer_name: document.getElementById(
+                    "customerName"
+                ).value.trim(),
+
+                start_date: startInput.value,
+                end_date: endInput.value
+            };
+
+            try {
+                await apiRequest("/rentals", {
+                    method: "POST",
+                    body: JSON.stringify(rental)
+                });
+
+                document.getElementById("rentalForm").reset();
+                document.getElementById("rentalSection").style.display = "none";
+
+                showMessage(
+                    "¡Arriendo registrado correctamente!",
+                    "success"
+                );
+
+                await loadVehicles();
+
+            } catch (error) {
+                showMessage(error.message, "error");
+            }
+        }
+    );
+
+    // Cargar catálogo al abrir la página
+    loadVehicles();
+
+</script>
+
+</body>
+</html>

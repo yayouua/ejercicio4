@@ -36,12 +36,13 @@ from app.security import hash_password, verify_password
 
 
 # =====================================================
-# CONFIGURACION
+# CONFIGURACION GENERAL
 # =====================================================
 
 BASE_DIR = Path(__file__).resolve().parent.parent
 STATIC_DIR = BASE_DIR / "static"
 
+# Crear las tablas de la base de datos
 Base.metadata.create_all(bind=engine)
 
 app = FastAPI(
@@ -50,9 +51,7 @@ app = FastAPI(
     version="1.0.0"
 )
 
-# Firma las cookies de sesión.
-# La clave de desarrollo debe reemplazarse por una variable secreta
-# antes de publicar el proyecto en internet.
+# Configuración de sesiones
 app.add_middleware(
     SessionMiddleware,
     secret_key=os.getenv(
@@ -64,6 +63,7 @@ app.add_middleware(
     max_age=28800
 )
 
+# Archivos estáticos
 app.mount(
     "/static",
     StaticFiles(directory=str(STATIC_DIR)),
@@ -108,7 +108,7 @@ def require_owner(
     if current_user.role != "OWNER":
         raise HTTPException(
             status_code=403,
-            detail="No tienes permiso. Esta función es exclusiva del dueño."
+            detail="Esta función es exclusiva del dueño."
         )
 
     return current_user
@@ -120,7 +120,7 @@ def require_customer(
     if current_user.role != "CUSTOMER":
         raise HTTPException(
             status_code=403,
-            detail="Esta función está disponible para clientes."
+            detail="Esta función es exclusiva de los clientes."
         )
 
     return current_user
@@ -219,6 +219,7 @@ def register_customer(
 
     except IntegrityError:
         db.rollback()
+
         raise HTTPException(
             status_code=409,
             detail="No se pudo registrar la cuenta."
@@ -312,7 +313,7 @@ def health():
 # VEHICULOS
 # =====================================================
 
-# Solo el dueño puede registrar vehículos.
+# Solo el dueño puede registrar vehículos
 @app.post(
     "/vehicles",
     response_model=VehicleResponse,
@@ -360,7 +361,7 @@ def create_vehicle(
     return new_vehicle
 
 
-# Los vehículos pueden consultarse para mostrar el catálogo.
+# Consultar vehículos del catálogo
 @app.get(
     "/vehicles",
     response_model=list[VehicleResponse],
@@ -369,11 +370,14 @@ def create_vehicle(
 def get_vehicles(
     db: Session = Depends(get_db)
 ):
-    return db.query(models.Vehicle).order_by(
-        models.Vehicle.id
-    ).all()
+    return (
+        db.query(models.Vehicle)
+        .order_by(models.Vehicle.id)
+        .all()
+    )
 
 
+# Consultar un vehículo por ID
 @app.get(
     "/vehicles/{vehicle_id}",
     response_model=VehicleResponse,
@@ -400,7 +404,7 @@ def get_vehicle(
 # ARRIENDOS
 # =====================================================
 
-# Solo un cliente autenticado puede registrar un arriendo.
+# Registrar arriendo: solo clientes
 @app.post(
     "/rentals",
     response_model=RentalResponse,
@@ -460,7 +464,7 @@ def create_rental(
     return new_rental
 
 
-# Solo el dueño puede consultar el historial completo.
+# Historial completo: solo dueño
 @app.get(
     "/rentals",
     response_model=list[RentalResponse],
@@ -470,16 +474,41 @@ def get_rentals(
     db: Session = Depends(get_db),
     current_user: models.User = Depends(require_owner)
 ):
-    return db.query(models.Rental).order_by(
-        models.Rental.id
-    ).all()
+    return (
+        db.query(models.Rental)
+        .order_by(models.Rental.id.desc())
+        .all()
+    )
+
+
+# =====================================================
+# HISTORIAL PERSONAL DEL CLIENTE
+# =====================================================
+
+@app.get(
+    "/my-rentals",
+    response_model=list[RentalResponse],
+    tags=["Arriendos"]
+)
+def get_my_rentals(
+    db: Session = Depends(get_db),
+    current_user: models.User = Depends(require_customer)
+):
+    return (
+        db.query(models.Rental)
+        .filter(
+            models.Rental.customer_name == current_user.username
+        )
+        .order_by(models.Rental.id.desc())
+        .all()
+    )
 
 
 # =====================================================
 # DEVOLUCIONES
 # =====================================================
 
-# Solo el dueño puede registrar devoluciones.
+# Solo el dueño puede registrar devoluciones
 @app.put(
     "/vehicles/{vehicle_id}/return",
     response_model=RentalResponse,

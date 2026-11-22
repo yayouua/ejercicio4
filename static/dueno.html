@@ -26,6 +26,14 @@
             padding: 24px 7%;
         }
 
+        header .header-content {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            flex-wrap: wrap;
+            gap: 15px;
+        }
+
         header p {
             color: #cbd5e1;
             margin-top: 7px;
@@ -37,6 +45,24 @@
             padding: 0 20px;
         }
 
+        button {
+            border: none;
+            padding: 11px 16px;
+            border-radius: 7px;
+            cursor: pointer;
+            font-weight: bold;
+        }
+
+        button:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        .logout {
+            background: #dc2626;
+            color: white;
+        }
+
         .top {
             display: flex;
             align-items: center;
@@ -44,12 +70,6 @@
             flex-wrap: wrap;
             gap: 15px;
             margin-bottom: 25px;
-        }
-
-        .top a {
-            color: #2563eb;
-            font-weight: bold;
-            text-decoration: none;
         }
 
         .stats {
@@ -105,33 +125,22 @@
             border-radius: 7px;
         }
 
-        button {
-            border: none;
-            padding: 11px 16px;
-            border-radius: 7px;
-            cursor: pointer;
-            font-weight: bold;
-        }
-
-        button:disabled {
-            opacity: 0.5;
-            cursor: not-allowed;
-        }
-
         .primary {
             background: #2563eb;
             color: white;
             margin-top: 17px;
         }
 
-        .return {
-            background: #ea580c;
-            color: white;
-        }
-
         .refresh {
             background: #e2e8f0;
             color: #1e293b;
+        }
+
+        .return {
+            background: #ea580c;
+            color: white;
+            width: 100%;
+            margin-top: 12px;
         }
 
         .vehicle-grid {
@@ -172,11 +181,6 @@
         .rented {
             background: #ffedd5;
             color: #9a3412;
-        }
-
-        .vehicle-card button {
-            width: 100%;
-            margin-top: 12px;
         }
 
         .table-container {
@@ -252,8 +256,18 @@
 <body>
 
 <header>
-    <h1>🔑 AutoRent - Administración</h1>
-    <p>Panel de gestión de vehículos y arriendos</p>
+    <div class="header-content">
+
+        <div>
+            <h1>🔑 AutoRent - Administración</h1>
+            <p>Panel de gestión de vehículos y arriendos</p>
+        </div>
+
+        <button class="logout" id="logoutButton">
+            Cerrar sesión
+        </button>
+
+    </div>
 </header>
 
 <main>
@@ -264,6 +278,9 @@
     </div>
 
     <div id="message" class="message"></div>
+
+
+    <!-- ESTADISTICAS -->
 
     <section class="stats">
 
@@ -288,6 +305,9 @@
         </div>
 
     </section>
+
+
+    <!-- REGISTRO DE VEHICULOS -->
 
     <section class="section">
 
@@ -337,12 +357,15 @@
 
     </section>
 
+
+    <!-- INVENTARIO -->
+
     <section class="section">
 
         <div class="top">
             <h2>Inventario de vehículos</h2>
 
-            <button class="refresh" onclick="loadData()">
+            <button class="refresh" id="refreshButton">
                 Actualizar información
             </button>
         </div>
@@ -353,20 +376,24 @@
 
     </section>
 
+
+    <!-- HISTORIAL COMPLETO -->
+
     <section class="section">
 
-        <h2>Historial de arriendos</h2>
+        <h2>Historial completo de arriendos</h2>
 
         <div class="table-container">
 
             <table>
+
                 <thead>
                     <tr>
                         <th>ID</th>
                         <th>Vehículo</th>
                         <th>Cliente</th>
-                        <th>Inicio</th>
-                        <th>Devolución</th>
+                        <th>Fecha de inicio</th>
+                        <th>Fecha de devolución</th>
                         <th>Estado</th>
                     </tr>
                 </thead>
@@ -376,6 +403,7 @@
                         <td colspan="6">Cargando historial...</td>
                     </tr>
                 </tbody>
+
             </table>
 
         </div>
@@ -388,10 +416,16 @@
     AutoRent - Administración de flota
 </footer>
 
+
 <script>
 
     let vehicles = [];
     let rentals = [];
+
+
+    // =================================================
+    // FUNCIONES GENERALES
+    // =================================================
 
     function escapeHTML(value) {
         return String(value).replace(/[&<>"']/g, character => ({
@@ -403,6 +437,7 @@
         })[character]);
     }
 
+
     function formatPrice(price) {
         return new Intl.NumberFormat("es-CL", {
             style: "currency",
@@ -411,24 +446,31 @@
         }).format(price);
     }
 
+
     function showMessage(message, type) {
+
         const box = document.getElementById("message");
 
         box.textContent = message;
         box.className = "message " + type;
         box.style.display = "block";
 
-        window.scrollTo({top: 0, behavior: "smooth"});
+        window.scrollTo({
+            top: 0,
+            behavior: "smooth"
+        });
 
         setTimeout(() => {
             box.style.display = "none";
         }, 5000);
     }
 
+
     async function apiRequest(url, options = {}) {
 
         const response = await fetch(url, {
             ...options,
+            credentials: "same-origin",
             headers: {
                 "Content-Type": "application/json",
                 ...options.headers
@@ -438,21 +480,32 @@
         const data = await response.json().catch(() => ({}));
 
         if (!response.ok) {
-            let detail = data.detail || "Error al procesar la solicitud.";
 
-            if (Array.isArray(detail)) {
-                detail = detail.map(item => item.msg).join(", ");
+            if (response.status === 401) {
+                window.location.href = "/login?role=OWNER";
             }
 
-            throw new Error(detail);
+            const error = new Error(
+                data.detail || "No se pudo completar la operación."
+            );
+
+            error.status = response.status;
+
+            throw error;
         }
 
         return data;
     }
 
+
+    // =================================================
+    // CARGAR INFORMACION
+    // =================================================
+
     async function loadData() {
 
         try {
+
             const results = await Promise.all([
                 apiRequest("/vehicles"),
                 apiRequest("/rentals")
@@ -466,9 +519,17 @@
             renderRentals();
 
         } catch (error) {
-            showMessage(error.message, "error");
+
+            if (error.status !== 401) {
+                showMessage(error.message, "error");
+            }
         }
     }
+
+
+    // =================================================
+    // ESTADISTICAS
+    // =================================================
 
     function updateStatistics() {
 
@@ -493,13 +554,20 @@
             rentals.length;
     }
 
+
+    // =================================================
+    // INVENTARIO
+    // =================================================
+
     function renderVehicles() {
 
         const container = document.getElementById("vehiclesList");
 
         if (vehicles.length === 0) {
+
             container.innerHTML =
                 '<p class="empty">No hay vehículos registrados.</p>';
+
             return;
         }
 
@@ -520,8 +588,12 @@
                     </h3>
 
                     <p>Patente: ${escapeHTML(vehicle.plate)}</p>
+
                     <p>Año: ${vehicle.year}</p>
-                    <p>Precio diario: ${formatPrice(vehicle.daily_price)}</p>
+
+                    <p>Precio diario:
+                        ${formatPrice(vehicle.daily_price)}
+                    </p>
 
                     ${
                         available
@@ -538,16 +610,25 @@
         }).join("");
     }
 
+
+    // =================================================
+    // HISTORIAL COMPLETO
+    // =================================================
+
     function renderRentals() {
 
         const container = document.getElementById("rentalsList");
 
         if (rentals.length === 0) {
+
             container.innerHTML = `
                 <tr>
-                    <td colspan="6">Todavía no hay arriendos registrados.</td>
+                    <td colspan="6">
+                        Todavía no hay arriendos registrados.
+                    </td>
                 </tr>
             `;
+
             return;
         }
 
@@ -561,23 +642,34 @@
                 ? `${vehicle.brand} ${vehicle.model}`
                 : `Vehículo #${rental.vehicle_id}`;
 
+            const rentalStatus = rental.status === "ACTIVE"
+                ? "Activo"
+                : "Finalizado";
+
             return `
                 <tr>
                     <td>${rental.id}</td>
+
                     <td>${escapeHTML(vehicleName)}</td>
+
                     <td>${escapeHTML(rental.customer_name)}</td>
+
                     <td>${rental.start_date}</td>
+
                     <td>${rental.end_date}</td>
-                    <td>${rental.status === "ACTIVE"
-                        ? "Activo"
-                        : "Finalizado"}</td>
+
+                    <td>${rentalStatus}</td>
                 </tr>
             `;
 
         }).join("");
     }
 
-    // Registrar vehículo
+
+    // =================================================
+    // REGISTRAR VEHICULOS
+    // =================================================
+
     document.getElementById("vehicleForm").addEventListener(
         "submit",
         async function(event) {
@@ -611,12 +703,17 @@
                 await loadData();
 
             } catch (error) {
+
                 showMessage(error.message, "error");
             }
         }
     );
 
-    // Registrar devolución
+
+    // =================================================
+    // REGISTRAR DEVOLUCIONES
+    // =================================================
+
     async function returnVehicle(vehicleId) {
 
         const confirmed = confirm(
@@ -642,11 +739,50 @@
             await loadData();
 
         } catch (error) {
+
             showMessage(error.message, "error");
         }
     }
 
-    // Cargar información inicial
+
+    // =================================================
+    // ACTUALIZAR INFORMACION
+    // =================================================
+
+    document.getElementById("refreshButton").addEventListener(
+        "click",
+        loadData
+    );
+
+
+    // =================================================
+    // CERRAR SESION
+    // =================================================
+
+    document.getElementById("logoutButton").addEventListener(
+        "click",
+        async () => {
+
+            try {
+
+                await apiRequest("/auth/logout", {
+                    method: "POST"
+                });
+
+                window.location.replace("/");
+
+            } catch (error) {
+
+                showMessage(error.message, "error");
+            }
+        }
+    );
+
+
+    // =================================================
+    // CARGAR DATOS AL ABRIR
+    // =================================================
+
     loadData();
 
 </script>

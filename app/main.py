@@ -1,5 +1,9 @@
 
+from pathlib import Path
+
 from fastapi import FastAPI, Depends, HTTPException, status
+from fastapi.responses import FileResponse
+from fastapi.staticfiles import StaticFiles
 from sqlalchemy.orm import Session
 from sqlalchemy.exc import IntegrityError
 
@@ -13,23 +17,44 @@ from app.schemas import (
 )
 
 
-# Crear las tablas de la base de datos
+# Directorios del proyecto
+BASE_DIR = Path(__file__).resolve().parent.parent
+STATIC_DIR = BASE_DIR / "static"
+
+# Crear las tablas
 Base.metadata.create_all(bind=engine)
 
 app = FastAPI(
     title="Sistema de Arriendo de Autos",
-    description="API para administrar vehículos y sus arriendos",
+    description="API para administrar vehículos y arriendos",
     version="1.0.0"
 )
 
+# Habilitar archivos estáticos
+app.mount(
+    "/static",
+    StaticFiles(directory=str(STATIC_DIR)),
+    name="static"
+)
+
+
+# ------------------------------
+# PAGINA PRINCIPAL
+# ------------------------------
 
 @app.get("/", tags=["Inicio"])
 def inicio():
     return {
         "mensaje": "Bienvenido al Sistema de Arriendo de Autos",
         "estado": "API funcionando correctamente",
-        "documentacion": "/docs"
+        "documentacion": "/docs",
+        "dashboard": "/dashboard"
     }
+
+
+@app.get("/dashboard", include_in_schema=False)
+def dashboard():
+    return FileResponse(STATIC_DIR / "index.html")
 
 
 @app.get("/health", tags=["Sistema"])
@@ -96,7 +121,11 @@ def create_vehicle(
     tags=["Vehículos"]
 )
 def get_vehicles(db: Session = Depends(get_db)):
-    return db.query(models.Vehicle).order_by(models.Vehicle.id).all()
+    return (
+        db.query(models.Vehicle)
+        .order_by(models.Vehicle.id)
+        .all()
+    )
 
 
 @app.get(
@@ -135,14 +164,12 @@ def create_rental(
     rental: RentalCreate,
     db: Session = Depends(get_db)
 ):
-    # Validar que la fecha de devolución sea posterior
     if rental.end_date <= rental.start_date:
         raise HTTPException(
             status_code=422,
             detail="La fecha de devolución debe ser posterior a la fecha de inicio"
         )
 
-    # Buscar el vehículo
     vehicle = db.query(models.Vehicle).filter(
         models.Vehicle.id == rental.vehicle_id
     ).first()
@@ -153,14 +180,12 @@ def create_rental(
             detail="Vehículo no encontrado"
         )
 
-    # Comprobar disponibilidad
     if vehicle.status != "AVAILABLE":
         raise HTTPException(
             status_code=409,
             detail="El vehículo ya se encuentra arrendado"
         )
 
-    # Crear el arriendo
     new_rental = models.Rental(
         vehicle_id=vehicle.id,
         customer_name=rental.customer_name,
@@ -169,9 +194,7 @@ def create_rental(
         status="ACTIVE"
     )
 
-    # Cambiar el estado del vehículo
     vehicle.status = "RENTED"
-
     db.add(new_rental)
 
     try:
@@ -187,14 +210,17 @@ def create_rental(
     return new_rental
 
 
-# Consultar el historial de arriendos
 @app.get(
     "/rentals",
     response_model=list[RentalResponse],
     tags=["Arriendos"]
 )
 def get_rentals(db: Session = Depends(get_db)):
-    return db.query(models.Rental).order_by(models.Rental.id).all()
+    return (
+        db.query(models.Rental)
+        .order_by(models.Rental.id)
+        .all()
+    )
 
 
 # ------------------------------
@@ -220,7 +246,6 @@ def return_vehicle(
             detail="Vehículo no encontrado"
         )
 
-    # Buscar el arriendo activo del vehículo
     active_rental = (
         db.query(models.Rental)
         .filter(
@@ -237,7 +262,6 @@ def return_vehicle(
             detail="El vehículo no tiene un arriendo activo"
         )
 
-    # Finalizar el arriendo y liberar el vehículo
     active_rental.status = "COMPLETED"
     vehicle.status = "AVAILABLE"
 

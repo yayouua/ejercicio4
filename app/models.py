@@ -1,3 +1,5 @@
+from sqlalchemy import Column, Integer, String, Float
+
 from app.database import Base
 
 
@@ -13,4 +15,8 @@ class Vehicle(Base):
 
     # AVAILABLE = disponible
     # RENTED = arrendado
-    status = Column(String(20), nullable=False, default="AVAILABLE")
+    status = Column(
+        String(20),
+        nullable=False,
+        default="AVAILABLE"
+    )

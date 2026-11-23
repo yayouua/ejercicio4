@@ -1,0 +1,486 @@
+
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>AutoRent - Acceso</title>
+
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: Arial, sans-serif;
+            background: #f1f5f9;
+            color: #1e293b;
+            min-height: 100vh;
+        }
+
+        header {
+            background: #172554;
+            color: white;
+            padding: 25px 8%;
+        }
+
+        header p {
+            color: #cbd5e1;
+            margin-top: 7px;
+        }
+
+        main {
+            max-width: 460px;
+            margin: 50px auto;
+            padding: 20px;
+        }
+
+        .panel {
+            background: white;
+            padding: 30px;
+            border-radius: 14px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.06);
+        }
+
+        h2 {
+            margin-bottom: 10px;
+        }
+
+        .description {
+            color: #64748b;
+            margin-bottom: 24px;
+            line-height: 1.5;
+        }
+
+        label {
+            display: block;
+            font-weight: bold;
+            font-size: 14px;
+            margin: 16px 0 7px;
+        }
+
+        input {
+            width: 100%;
+            padding: 13px;
+            border: 1px solid #cbd5e1;
+            border-radius: 7px;
+            font-size: 15px;
+        }
+
+        button {
+            width: 100%;
+            padding: 13px;
+            border: none;
+            border-radius: 7px;
+            font-weight: bold;
+            font-size: 15px;
+            cursor: pointer;
+            margin-top: 20px;
+            background: #2563eb;
+            color: white;
+        }
+
+        button:disabled {
+            opacity: 0.6;
+            cursor: wait;
+        }
+
+        .secondary {
+            background: #059669;
+        }
+
+        .switch {
+            margin-top: 20px;
+            text-align: center;
+            font-size: 14px;
+            color: #64748b;
+        }
+
+        .switch a {
+            color: #2563eb;
+            font-weight: bold;
+            cursor: pointer;
+            text-decoration: none;
+        }
+
+        .message {
+            display: none;
+            padding: 12px;
+            border-radius: 7px;
+            margin-bottom: 18px;
+            font-size: 14px;
+        }
+
+        .error {
+            display: block;
+            color: #991b1b;
+            background: #fee2e2;
+        }
+
+        .success {
+            display: block;
+            color: #166534;
+            background: #dcfce7;
+        }
+
+        .back {
+            display: block;
+            margin-top: 25px;
+            text-align: center;
+            text-decoration: none;
+            color: #2563eb;
+        }
+
+        .hidden {
+            display: none;
+        }
+
+        footer {
+            text-align: center;
+            color: #64748b;
+            padding: 25px;
+        }
+    </style>
+</head>
+
+<body>
+
+<header>
+    <h1>🚗 AutoRent</h1>
+    <p>Sistema de arriendo de vehículos</p>
+</header>
+
+<main>
+
+    <section class="panel">
+
+        <div id="message" class="message"></div>
+
+        <!-- INICIO DE SESION -->
+
+        <div id="loginPanel">
+
+            <h2 id="loginTitle">Iniciar sesión</h2>
+
+            <p id="loginDescription" class="description">
+                Ingresa tus datos para acceder al sistema.
+            </p>
+
+            <form id="loginForm">
+
+                <label for="loginUsername">
+                    Nombre de usuario
+                </label>
+
+                <input
+                    id="loginUsername"
+                    type="text"
+                    required
+                    minlength="3"
+                    autocomplete="username"
+                >
+
+                <label for="loginPassword">
+                    Contraseña
+                </label>
+
+                <input
+                    id="loginPassword"
+                    type="password"
+                    required
+                    autocomplete="current-password"
+                >
+
+                <button id="loginButton" type="submit">
+                    Ingresar
+                </button>
+
+            </form>
+
+            <div class="switch" id="registerOption">
+                ¿No tienes una cuenta?
+                <a id="showRegister">Regístrate aquí</a>
+            </div>
+
+        </div>
+
+
+        <!-- REGISTRO DE CLIENTE -->
+
+        <div id="registerPanel" class="hidden">
+
+            <h2>Crear cuenta de cliente</h2>
+
+            <p class="description">
+                Completa los datos para registrarte en AutoRent.
+            </p>
+
+            <form id="registerForm">
+
+                <label for="registerUsername">
+                    Nombre de usuario
+                </label>
+
+                <input
+                    id="registerUsername"
+                    required
+                    minlength="3"
+                    maxlength="50"
+                    autocomplete="username"
+                >
+
+                <label for="registerEmail">
+                    Correo electrónico
+                </label>
+
+                <input
+                    id="registerEmail"
+                    type="email"
+                    required
+                    autocomplete="email"
+                >
+
+                <label for="registerPassword">
+                    Contraseña
+                </label>
+
+                <input
+                    id="registerPassword"
+                    type="password"
+                    required
+                    minlength="8"
+                    maxlength="100"
+                    autocomplete="new-password"
+                >
+
+                <button class="secondary" type="submit">
+                    Crear cuenta
+                </button>
+
+            </form>
+
+            <div class="switch">
+                ¿Ya tienes una cuenta?
+                <a id="showLogin">Inicia sesión</a>
+            </div>
+
+        </div>
+
+        <a class="back" href="/">← Volver al inicio</a>
+
+    </section>
+
+</main>
+
+<footer>
+    AutoRent - Acceso de usuarios
+</footer>
+
+
+<script>
+
+    const params = new URLSearchParams(window.location.search);
+
+    const intendedRole = params.get("role") === "OWNER"
+        ? "OWNER"
+        : "CUSTOMER";
+
+    const messageBox = document.getElementById("message");
+
+    function showMessage(message, type) {
+        messageBox.textContent = message;
+        messageBox.className = "message " + type;
+    }
+
+    function showLogin() {
+        document.getElementById("loginPanel").classList.remove("hidden");
+        document.getElementById("registerPanel").classList.add("hidden");
+        messageBox.className = "message";
+    }
+
+    function showRegister() {
+        document.getElementById("loginPanel").classList.add("hidden");
+        document.getElementById("registerPanel").classList.remove("hidden");
+        messageBox.className = "message";
+    }
+
+    document.getElementById("showRegister").addEventListener(
+        "click",
+        showRegister
+    );
+
+    document.getElementById("showLogin").addEventListener(
+        "click",
+        showLogin
+    );
+
+    // Cambiar presentación según el tipo de usuario seleccionado.
+    if (intendedRole === "OWNER") {
+        document.getElementById("loginTitle").textContent =
+            "Acceso del dueño";
+
+        document.getElementById("loginDescription").textContent =
+            "Ingresa con la cuenta de administración.";
+
+        document.getElementById("registerOption").classList.add("hidden");
+    } else {
+        document.getElementById("loginTitle").textContent =
+            "Acceso del cliente";
+    }
+
+
+    // =================================================
+    // INICIO DE SESION
+    // =================================================
+
+    document.getElementById("loginForm").addEventListener(
+        "submit",
+        async function(event) {
+
+            event.preventDefault();
+
+            const button = document.getElementById("loginButton");
+            button.disabled = true;
+
+            const credentials = {
+                username: document.getElementById(
+                    "loginUsername"
+                ).value.trim(),
+
+                password: document.getElementById(
+                    "loginPassword"
+                ).value
+            };
+
+            try {
+
+                const response = await fetch("/auth/login", {
+                    method: "POST",
+                    credentials: "same-origin",
+                    headers: {
+                        "Content-Type": "application/json"
+                    },
+                    body: JSON.stringify(credentials)
+                });
+
+                const data = await response.json();
+
+                if (!response.ok) {
+                    throw new Error(
+                        data.detail || "No se pudo iniciar sesión."
+                    );
+                }
+
+                // Comprobar que el rol corresponda al acceso elegido.
+                if (data.role !== intendedRole) {
+
+                    await fetch("/auth/logout", {
+                        method: "POST",
+                        credentials: "same-origin"
+                    });
+
+                    throw new Error(
+                        "Esta cuenta no corresponde al tipo de usuario seleccionado."
+                    );
+                }
+
+                showMessage(
+                    "Bienvenido, " + data.username,
+                    "success"
+                );
+
+                if (data.role === "OWNER") {
+                    window.location.href = "/dueno";
+                } else {
+                    window.location.href = "/cliente";
+                }
+
+            } catch (error) {
+                showMessage(error.message, "error");
+                button.disabled = false;
+            }
+        }
+    );
+
+
+    // =================================================
+    // REGISTRO DE CLIENTES
+    // =================================================
+
+    document.getElementById("registerForm").addEventListener(
+        "submit",
+        async function(event) {
+
+            event.preventDefault();
+
+            const user = {
+                username: document.getElementById(
+                    "registerUsername"
+                ).value.trim(),
+
+                email: document.getElementById(
+                    "registerEmail"
+                ).value.trim(),
+
+                password: document.getElementById(
+                    "registerPassword"
+                ).value
+            };
+
+            try {
+
+                const response = await fetch("/auth/register", {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json"
+                    },
+                    body: JSON.stringify(user)
+                });
+
+                const data = await response.json();
+
+                if (!response.ok) {
+                    throw new Error(
+                        data.detail || "No se pudo crear la cuenta."
+                    );
+                }
+
+                showMessage(
+                    "Cuenta creada correctamente. Iniciando sesión...",
+                    "success"
+                );
+
+                // Iniciar sesión automáticamente después del registro.
+                const loginResponse = await fetch("/auth/login", {
+                    method: "POST",
+                    credentials: "same-origin",
+                    headers: {
+                        "Content-Type": "application/json"
+                    },
+                    body: JSON.stringify({
+                        username: user.username,
+                        password: user.password
+                    })
+                });
+
+                if (!loginResponse.ok) {
+                    throw new Error(
+                        "Cuenta creada, pero no se pudo iniciar sesión."
+                    );
+                }
+
+                window.location.href = "/cliente";
+
+            } catch (error) {
+                showMessage(error.message, "error");
+            }
+        }
+    );
+
+</script>
+
+</body>
+</html>

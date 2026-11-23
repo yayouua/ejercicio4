@@ -1,0 +1,179 @@
+
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>AutoRent - Inicio</title>
+
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: Arial, sans-serif;
+            background: #f1f5f9;
+            color: #1e293b;
+        }
+
+        header {
+            background: #172554;
+            color: white;
+            padding: 25px 8%;
+        }
+
+        header h1 {
+            font-size: 28px;
+        }
+
+        header p {
+            color: #cbd5e1;
+            margin-top: 8px;
+        }
+
+        main {
+            max-width: 1000px;
+            margin: 65px auto;
+            padding: 20px;
+            text-align: center;
+        }
+
+        main h2 {
+            font-size: 30px;
+            margin-bottom: 12px;
+        }
+
+        main > p {
+            color: #64748b;
+            margin-bottom: 35px;
+        }
+
+        .options {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 25px;
+        }
+
+        .card {
+            background: white;
+            padding: 40px 25px;
+            border-radius: 15px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.06);
+        }
+
+        .icon {
+            font-size: 55px;
+            margin-bottom: 20px;
+        }
+
+        .card h3 {
+            font-size: 23px;
+            margin-bottom: 12px;
+        }
+
+        .card p {
+            color: #64748b;
+            line-height: 1.6;
+            margin-bottom: 25px;
+        }
+
+        .button {
+            display: inline-block;
+            padding: 13px 25px;
+            border-radius: 8px;
+            text-decoration: none;
+            color: white;
+            font-weight: bold;
+        }
+
+        .customer {
+            background: #2563eb;
+        }
+
+        .owner {
+            background: #059669;
+        }
+
+        .button:hover {
+            opacity: 0.85;
+        }
+
+        footer {
+            text-align: center;
+            padding: 25px;
+            color: #64748b;
+        }
+
+        @media(max-width: 650px) {
+            .options {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+<header>
+    <h1>🚗 AutoRent</h1>
+    <p>Sistema de arriendo de vehículos</p>
+</header>
+
+<main>
+
+    <h2>Bienvenido a AutoRent</h2>
+
+    <p>
+        Selecciona cómo deseas ingresar al sistema.
+    </p>
+
+    <div class="options">
+
+        <section class="card">
+
+            <div class="icon">👤</div>
+
+            <h3>Cliente</h3>
+
+            <p>
+                Explora nuestro catálogo de automóviles,
+                consulta su disponibilidad y solicita un arriendo.
+            </p>
+
+            <a class="button customer" href="/login?role=CUSTOMER">
+                Ingresar como cliente
+            </a>
+
+        </section>
+
+        <section class="card">
+
+            <div class="icon">🔑</div>
+
+            <h3>Dueño</h3>
+
+            <p>
+                Administra los vehículos, registra automóviles,
+                controla los arriendos y las devoluciones.
+            </p>
+
+            <a class="button owner" href="/login?role=OWNER">
+                Ingresar como dueño
+            </a>
+
+        </section>
+
+    </div>
+
+</main>
+
+<footer>
+    AutoRent - Proyecto académico
+</footer>
+
+</body>
+</html>
